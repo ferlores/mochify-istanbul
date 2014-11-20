@@ -1,0 +1,35 @@
+{
+  "name": "mochify-istanbul",
+  "version": "0.0.0",
+  "description": "Istanbul for mochify",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha ./test/basic.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ferlores/mochify-istanbul.git"
+  },
+  "keywords": [
+    "mochify",
+    "istanbul",
+    "coverage"
+  ],
+  "author": "Fernando Lores",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ferlores/mochify-istanbul/issues"
+  },
+  "homepage": "https://github.com/ferlores/mochify-istanbul",
+  "dependencies": {
+    "istanbul": "^0.3.2",
+    "through2": "^0.6.3"
+  },
+  "devDependencies": {
+    "assert": "^1.1.2",
+    "mocha": "^2.0.1",
+    "mochify": "git://github.com/ferlores/mochify.js",
+    "phantomjs": "^1.9.12",
+    "rimraf": "^2.2.8"
+  }
+}
