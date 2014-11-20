@@ -91,6 +91,9 @@ describe('Basic', function () {
     }).bundle(validateOutput(done))
   });
 
+  it('should pass through the options to instrumenter');
+  it('should pass through the options to reporter');
+
   // it('should instrument all the extra files');
   // it('should not fail if covering empty files __coverage__');
 });
