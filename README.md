@@ -20,5 +20,13 @@ va b = mochify('path/to/your/file', mochifyOpts)
   .bundle();
 ```
 
+## Compatibility
+ - Node >= 0.10
+ - v0.x
+    - Mochify 2.x
+        - Browserify 6.x
+        - Mocha 2.x
+
+
 ## Run tests
 Clone the repo and run ```npm install && npm test```
