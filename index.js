@@ -1,10 +1,17 @@
 var Istanbul = require('istanbul');
 var through = require('through2');
+var minimatch = require("minimatch");
 
 function instrument(options) {
+  var filesPattern = options.files || '**/*.js';
+  var excludePattern = options.exclude || '';
   var instrumenter = new Istanbul.Instrumenter(options);
 
   function transform(file) {
+    // If if doesnt match the pattern dont instrument it
+    if (!minimatch(file, filesPattern) || minimatch(file, excludePattern))
+      return through();
+
     var data = '';
     return through(function(buf, enc, next) {
       data += buf;

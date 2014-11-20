@@ -1,4 +1,4 @@
-mochify-istanbul
+mochify-istanbul (WORK IN PROGRESS)
 =====================
 
 Add istanbul coverage to the [mochify.js](https://github.com/mantoni/mochify.js) pipeline.
@@ -21,6 +21,9 @@ va b = mochify('path/to/your/file', mochifyOpts)
   }))
   .bundle();
 ```
+
+## Options
+TODO
 
 ## Compatibility
  - Node >= 0.10

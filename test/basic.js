@@ -93,6 +93,9 @@ describe('Basic', function () {
 
   it('should pass through the options to instrumenter');
   it('should pass through the options to reporter');
+  it('should add the reporters');
+  it('should intrument only the specified files');
+  it('should not intrument the files that matches exclude');
 
   // it('should instrument all the extra files');
   // it('should not fail if covering empty files __coverage__');

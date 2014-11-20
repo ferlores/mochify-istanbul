@@ -23,6 +23,7 @@
   "homepage": "https://github.com/ferlores/mochify-istanbul",
   "dependencies": {
     "istanbul": "^0.3.2",
+    "minimatch": "^1.0.0",
     "through2": "^0.6.3"
   },
   "devDependencies": {
