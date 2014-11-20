@@ -13,6 +13,9 @@ $ npm install mochify mochify-istanbul
 ## Usage
 
 ```javascript
+var mochify = require('mochify');
+var istanbul = require('mochify-istanbul');
+
 va b = mochify('path/to/your/file', mochifyOpts)
   .plugin(istanbul({
     reporter: { reports: ['text', 'cobertura', 'json'] }
