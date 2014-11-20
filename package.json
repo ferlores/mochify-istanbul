@@ -28,7 +28,7 @@
   "devDependencies": {
     "assert": "^1.1.2",
     "mocha": "^2.0.1",
-    "mochify": "git://github.com/ferlores/mochify.js",
+    "mochify": "^2.0.0",
     "phantomjs": "^1.9.12",
     "rimraf": "^2.2.8"
   }
