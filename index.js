@@ -29,7 +29,8 @@ function instrument(options) {
 
 function writeReports(options) {
   var collector = new Istanbul.Collector();
-  var reporter = new Istanbul.Reporter();
+  var reports = options.reports || [];
+  delete(options.reports);
 
   var data = '';
   return through(function(buf, enc, next) {
@@ -51,10 +52,12 @@ function writeReports(options) {
     collector.add(JSON.parse(match[1]));
 
     // Add reports
-    if (options.reports) reporter.addAll(options.reports);
+    [].concat(reports).forEach(function (reportType) {
+      Istanbul.Report
+        .create(reportType, Object.create(options))
+        .writeReport(collector, true);
+    });
 
-    var sync = true;
-    reporter.write(collector, sync, function () {});
     next();
   });
 }
