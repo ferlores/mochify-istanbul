@@ -2,7 +2,6 @@ mochify-istanbul
 =====================
 
 Add istanbul coverage to the [mochify.js](https://github.com/mantoni/mochify.js) pipeline.
-**NOTE:** This will work with >= mochify.js@2.0.0, in the mean time it depends on a fork that already returns the browserify bundle
 
 ## Install
 
