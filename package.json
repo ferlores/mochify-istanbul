@@ -4,7 +4,7 @@
   "description": "Istanbul for mochify",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha ./test/basic.js"
+    "test": "./node_modules/.bin/mocha ./test/*.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/ferlores/mochify-istanbul",
   "dependencies": {
     "istanbul": "^0.3.2",
+    "lodash": "^2.4.1",
     "minimatch": "^1.0.0",
     "through2": "^0.6.3"
   },

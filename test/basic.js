@@ -1,3 +1,5 @@
+
+var fs = require('fs');
 var path = require('path');
 var mochify = require('mochify');
 var assert = require('assert');
@@ -6,20 +8,27 @@ var rimraf = require('rimraf');
 var istanbul = require('../');
 
 var phantomjsPath = path.resolve('node_modules/.bin/phantomjs');
-var defaultOutputJSON = path.resolve('coverage/coverage-final.json');
+var defaultOutputJSON = path.resolve('./coverage-final.json');
+var defaultOutputXML = path.resolve('./cobertura-coverage.xml');
 
 var out;
 var output;
 
-function validateOutput(done) {
+function validateOutput(validator) {
   return function (err) {
+    var report;
+
     if (err) return done(err);
 
+    // Forces reload of the json file
+    delete(require.cache[defaultOutputJSON]);
+
     assert.doesNotThrow(function () {
-      // require(defaultOutputJSON);
+      report = require(defaultOutputJSON);
     }, 'coverage file not found or invalid');
 
-    done();
+    assert.ok(fs.existsSync(defaultOutputXML), 'cobertura file not found');
+    if (validator) validator(report);
   };
 }
 
@@ -49,26 +58,40 @@ describe('Basic', function () {
   beforeEach(function () {
     resetOutput();
     rimraf.sync(defaultOutputJSON);
+    rimraf.sync(defaultOutputXML);
   });
 
   it('should instrument the code and run report', function (done) {
     createTestInstance('./test/fixtures/pass-100.js', {
-      reporter: { reports: ['json'] }
-    }).bundle(validateOutput(done))
+      reports: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-100.js', 'wrong file instrumented');
+      done();
+    }));
   });
 
   it('should not fail if test fails', function (done) {
     createTestInstance('./test/fixtures/fail-50.js', {
-      instrumenter: { variable: 'going_to_be_ignored'},
-      reporter: { reports: ['json'] }
-    }).bundle(validateOutput(done))
+      reports: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'fail-50.js', 'wrong file instrumented');
+      done();
+    }));
   });
 
   it('should not modify the output of mochify', function (done) {
-    var testFile = './test/fixtures/pass-50.js';
+    var testFile = './test/fixtures/pass-100.js';
     var firstOut;
 
-    createTestInstance(testFile, {})
+    createTestInstance(testFile, {
+      reports: ['json']
+    })
     .bundle(function () {
       // save first output, reset the stream and compare
       firstOut = out;
@@ -81,23 +104,29 @@ describe('Basic', function () {
         assert.deepEqual(firstOut, out);
         done();
       });
-    })
+    });
   });
 
-  it('should override the variable configuration', function (done) {
-    createTestInstance('./test/fixtures/pass-50.js', {
-      instrumenter: { variable: 'going_to_be_ignored'},
-      reporter: { reports: ['json'] }
-    }).bundle(validateOutput(done))
+  it('should not instrument the exclude the pattern', function (done) {
+    createTestInstance('./test/fixtures/pass-50-ignore-case.js', {
+      exclude: '**/ignored.js',
+      reports: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-50-ignore-case.js', 'wrong file instrumented');
+      done();
+    }));
   });
 
-  it('should pass through the options to instrumenter');
-  it('should pass through the options to reporter');
-  it('should add the reporters');
-  it('should intrument only the specified files');
-  it('should not intrument the files that matches exclude');
-
-  // it('should instrument all the extra files');
-  // it('should not fail if covering empty files __coverage__');
+  it('should not fail if no instrumented files', function (done) {
+    createTestInstance('./test/fixtures/pass-50-ignore-case.js', {
+      exclude: '**/*',
+      reports: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      assert.deepEqual(report, {}, 'some files were instrumented');
+      done();
+    }));
+  });
 });
-

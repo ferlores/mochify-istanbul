@@ -1,15 +1,15 @@
 var Istanbul = require('istanbul');
 var through = require('through2');
 var minimatch = require("minimatch");
+var _ = require('lodash');
 
 function instrument(options) {
-  var filesPattern = options.files || '**/*.js';
   var excludePattern = options.exclude || '';
-  var instrumenter = new Istanbul.Instrumenter(options);
+  var instrumenter = new Istanbul.Instrumenter();
 
   function transform(file) {
     // If if doesnt match the pattern dont instrument it
-    if (!minimatch(file, filesPattern) || minimatch(file, excludePattern))
+    if (minimatch(file, excludePattern))
       return through();
 
     var data = '';
@@ -22,7 +22,7 @@ function instrument(options) {
         if (!err) {
           // Inject __converage__ var
           self.push(code);
-          self.push('console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");')
+          self.push('console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");');
         } else {
           self.emit('error', err);
         }
@@ -32,7 +32,7 @@ function instrument(options) {
   }
 
   return transform;
-};
+}
 
 function writeReports(options) {
   var collector = new Istanbul.Collector();
@@ -46,22 +46,20 @@ function writeReports(options) {
   }, function(next) {
     var re = /__coverage__='([^;]*)';\n/gi,
         match = re.exec(data),
-        coverageStr;
-
-    // Variable not found
-    if (!match || !match[1])
-      return next('mochify-istanbul: ERROR: __coverage__ variable not found in the bundle. Maybe not files instrumented');
+        coverage;
 
     // Clean up the stream
     this.push(data.replace(re,''));
 
     // match[1] contains JSON.stringify(__coverage__)
-    collector.add(JSON.parse(match[1]));
+    coverage = match ? JSON.parse(match[1]) || {} : {};
+
+    collector.add(coverage);
 
     // Add reports
     [].concat(reports).forEach(function (reportType) {
       Istanbul.Report
-        .create(reportType, Object.create(options))
+        .create(reportType, _.clone(options))
         .writeReport(collector, true);
     });
 
@@ -70,13 +68,10 @@ function writeReports(options) {
 }
 
 module.exports = function (options) {
-  // Force variable name
-  options.instrumenter = options.instrumenter || {};
-  options.reporter = options.reporter || {};
-  options.instrumenter.variable = '__coverage__';
+  var reporterOptions = _.omit(options, 'exclude');
 
   return function (b, opts) {
-    b.transform(instrument(options.instrumenter));
-    b.pipeline.get('wrap').push(writeReports(options.reporter));
-  }
-}
+    b.transform(instrument(options));
+    b.pipeline.get('wrap').push(writeReports(reporterOptions));
+  };
+};
