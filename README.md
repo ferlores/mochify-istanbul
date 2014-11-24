@@ -1,4 +1,4 @@
-mochify-istanbul
+mochify-istanbul [![travis status](https://travis-ci.org/ferlores/mochify-istanbul.svg?branch=master)](https://travis-ci.org/ferlores/mochify-istanbul)
 =====================
 
 Add istanbul coverage to the [mochify.js](https://github.com/mantoni/mochify.js) pipeline.
