@@ -26,7 +26,7 @@ function instrument(options) {
         if (!err) {
           // Inject __converage__ var
           self.push(code);
-          self.push('console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");');
+          self.push('after(function(){console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");});');
         } else {
           self.emit('error', err);
         }
