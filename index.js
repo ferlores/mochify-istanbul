@@ -36,8 +36,8 @@ function instrument(options) {
 
 function writeReports(options) {
   var collector = new Istanbul.Collector();
-  var reports = options.reports || [];
-  delete(options.reports);
+  var report = options.report || [];
+  delete(options.report);
 
   var data = '';
   return through(function(buf, enc, next) {
@@ -56,8 +56,8 @@ function writeReports(options) {
 
     collector.add(coverage);
 
-    // Add reports
-    [].concat(reports).forEach(function (reportType) {
+    // Add report
+    [].concat(report).forEach(function (reportType) {
       Istanbul.Report
         .create(reportType, _.clone(options))
         .writeReport(collector, true);
@@ -67,11 +67,9 @@ function writeReports(options) {
   });
 }
 
-module.exports = function (options) {
-  var reporterOptions = _.omit(options, 'exclude');
+module.exports = function (b, opts) {
+  var reporterOptions = _.omit(opts, 'exclude');
 
-  return function (b, opts) {
-    b.transform(instrument(options));
-    b.pipeline.get('wrap').push(writeReports(reporterOptions));
-  };
+  b.transform(instrument(opts));
+  b.pipeline.get('wrap').push(writeReports(reporterOptions));
 };

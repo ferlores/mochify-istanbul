@@ -18,7 +18,7 @@ function validateOutput(validator) {
   return function (err) {
     var report;
 
-    if (err) return done(err);
+    if (err) return validator(err);
 
     // Forces reload of the json file
     delete(require.cache[defaultOutputJSON]);
@@ -41,7 +41,7 @@ function createTestInstance(testFile, opts) {
     // output: debugOutput, // for debugging
     reporter: 'tap'
   })
-  .plugin(istanbul(opts));
+  .plugin(istanbul, opts);
 }
 
 function resetOutput() {
@@ -63,7 +63,7 @@ describe('Basic', function () {
 
   it('should instrument the code and run report', function (done) {
     createTestInstance('./test/fixtures/pass-100.js', {
-      reports: ['json', 'cobertura']
+      report: ['json', 'cobertura']
     }).bundle(validateOutput(function (report) {
       var keys = Object.keys(report);
 
@@ -75,7 +75,7 @@ describe('Basic', function () {
 
   it('should not fail if test fails', function (done) {
     createTestInstance('./test/fixtures/fail-50.js', {
-      reports: ['json', 'cobertura']
+      report: ['json', 'cobertura']
     }).bundle(validateOutput(function (report) {
       var keys = Object.keys(report);
 
@@ -90,7 +90,7 @@ describe('Basic', function () {
     var firstOut;
 
     createTestInstance(testFile, {
-      reports: ['json']
+      report: ['json']
     })
     .bundle(function () {
       // save first output, reset the stream and compare
@@ -110,7 +110,7 @@ describe('Basic', function () {
   it('should not instrument the exclude the pattern', function (done) {
     createTestInstance('./test/fixtures/pass-50-ignore-case.js', {
       exclude: '**/ignored.js',
-      reports: ['json', 'cobertura']
+      report: ['json', 'cobertura']
     }).bundle(validateOutput(function (report) {
       var keys = Object.keys(report);
 
@@ -123,7 +123,7 @@ describe('Basic', function () {
   it('should not fail if no instrumented files', function (done) {
     createTestInstance('./test/fixtures/pass-50-ignore-case.js', {
       exclude: '**/*',
-      reports: ['json', 'cobertura']
+      report: ['json', 'cobertura']
     }).bundle(validateOutput(function (report) {
       assert.deepEqual(report, {}, 'some files were instrumented');
       done();

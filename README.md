@@ -20,7 +20,8 @@ va b = mochify('path/to/your/file', mochifyOpts)
     // Intrumenter options
     exclude: '**/test/**/*',
     // Reporter options
-    reports: ['text', 'cobertura', 'json']
+    report: ['text', 'cobertura', 'json'],
+    dir: './coverage'
   }))
   .bundle();
 ```
@@ -28,11 +29,15 @@ va b = mochify('path/to/your/file', mochifyOpts)
 ## Options
 There are only two options specific to this module, all the rest options are passed directly to the reporters
 * ```options.exclude = '<glob pattern>'```: Files to exclude for the instrumenter
-* ```options.reports = ['<report type>']```: Array of reports to generate. Check [istanbul](https://github.com/gotwarlost/istanbul) for a updated list of reports
+* ```options.report = ['<report type>']```: Array of reports to generate. Check [istanbul](https://github.com/gotwarlost/istanbul) for a updated list of reports
+
+## Command line usage
+
+``` mochify --plugin [ mochify-istanbul --exclude '**/test/**/*' --report json --report cobertura --dir ./coverage ] test.js```
 
 ## Compatibility
  - Node >= 0.10
- - v0.x, v1.0
+ - v0.x, v1.0, v2.0
     - Mochify 2.x
         - Browserify 6.x
         - Mocha 2.x
