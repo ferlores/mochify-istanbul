@@ -33,7 +33,9 @@ There are only two options specific to this module, all the rest options are pas
 
 ## Command line usage
 
-``` mochify --plugin [ mochify-istanbul --exclude '**/test/**/*' --report json --report cobertura --dir ./coverage ] test.js```
+``` bash
+$ mochify --plugin [ mochify-istanbul --exclude '**/test/**/*' --report json --report cobertura --dir ./coverage ] test.js
+```
 
 ## Compatibility
  - Node >= 0.10
