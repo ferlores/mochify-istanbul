@@ -4,12 +4,16 @@ var minimatch = require("minimatch");
 var _ = require('lodash');
 
 function instrument(options) {
-  var excludePattern = options.exclude || '';
+  var excludePattern = options.exclude ? [].concat(options.exclude) : [''];
   var instrumenter = new Istanbul.Instrumenter();
 
   function transform(file) {
     // If if doesnt match the pattern dont instrument it
-    if (minimatch(file, excludePattern))
+    var matchResult = _.compact(_.map(excludePattern, function (pattern) {
+      return minimatch(file, pattern);
+    }));
+
+    if (matchResult.length)
       return through();
 
     var data = '';

@@ -18,7 +18,7 @@ var istanbul = require('mochify-istanbul');
 va b = mochify('path/to/your/file', mochifyOpts)
   .plugin(istanbul({
     // Intrumenter options
-    exclude: '**/test/**/*',
+    exclude: ['**/test/**', '**/node_modules/**']
     // Reporter options
     report: ['text', 'cobertura', 'json'],
     dir: './coverage'
@@ -28,7 +28,7 @@ va b = mochify('path/to/your/file', mochifyOpts)
 
 ## Options
 There are only two options specific to this module, all the rest options are passed directly to the reporters
-* ```options.exclude = '<glob pattern>'```: Files to exclude for the instrumenter
+* ```options.exclude = '<glob pattern>' || ['<glob pattern>']```: Files to exclude for the instrumenter
 * ```options.report = ['<report type>']```: Array of reports to generate. Check [istanbul](https://github.com/gotwarlost/istanbul) for a updated list of reports
 
 ## Command line usage

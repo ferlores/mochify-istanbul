@@ -109,7 +109,20 @@ describe('Basic', function () {
 
   it('should not instrument the exclude the pattern', function (done) {
     createTestInstance('./test/fixtures/pass-50-ignore-case.js', {
-      exclude: '**/ignored.js',
+      exclude: '**/ignored*.js',
+      report: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-50-ignore-case.js', 'wrong file instrumented');
+      done();
+    }));
+  });
+
+  it('should not instrument the exclude the patterns', function (done) {
+    createTestInstance('./test/fixtures/pass-50-ignore-case.js', {
+      exclude: ['**/ignored.js', '**/ignored2.js'],
       report: ['json', 'cobertura']
     }).bundle(validateOutput(function (report) {
       var keys = Object.keys(report);
