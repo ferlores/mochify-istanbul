@@ -1,5 +1,6 @@
 mochify-istanbul [![travis status](https://travis-ci.org/ferlores/mochify-istanbul.svg?branch=master)](https://travis-ci.org/ferlores/mochify-istanbul)
 =====================
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/ferlores/mochify-istanbul?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Add istanbul coverage to the [mochify.js](https://github.com/mantoni/mochify.js) pipeline.
 
