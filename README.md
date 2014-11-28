@@ -2,7 +2,7 @@ mochify-istanbul [![travis status](https://travis-ci.org/ferlores/mochify-istanb
 =====================
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/ferlores/mochify-istanbul?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Add istanbul coverage to the [mochify.js](https://github.com/mantoni/mochify.js) pipeline.
+Add [istanbul](https://github.com/gotwarlost/istanbul) coverage to the [mochify.js](https://github.com/mantoni/mochify.js) pipeline.
 
 ## Install
 
@@ -29,7 +29,7 @@ va b = mochify('path/to/your/file', mochifyOpts)
 
 ## Options
 There are only two options specific to this module, all the rest options are passed directly to the reporters
-* ```options.exclude = '<glob pattern>' || ['<glob pattern>']```: Files to exclude for the instrumenter. **Note** that all the exclude pattern should start with '**/' since the mathing is being done against absoulte path for the files.
+* ```options.exclude = '<glob pattern>' || ['<glob pattern>']```: Files to exclude for the instrumenter. **Note** that all the exclude pattern should start with '**/' since the matching is done using the absoulte path for the files.
 * ```options.report = ['<report type>']```: Array of reports to generate. Check [istanbul](https://github.com/gotwarlost/istanbul) for a updated list of reports
 
 ## Command line usage
@@ -54,7 +54,7 @@ Clone the repo and run ```npm install && npm test```
 
 (The MIT License)
 
-Copyright (c) 2012 Fenando Lores <ferlores@gmail.com>
+Copyright (c) 2012 Fernando Lores <ferlores@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
