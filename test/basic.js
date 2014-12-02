@@ -1,3 +1,5 @@
+/*global it, describe, beforeEach */
+'use strict';
 
 var fs = require('fs');
 var path = require('path');
@@ -18,17 +20,21 @@ function validateOutput(validator) {
   return function (err) {
     var report;
 
-    if (err) return validator(err);
+    if (err) {
+      return validator(err);
+    }
 
     // Forces reload of the json file
-    delete(require.cache[defaultOutputJSON]);
+    delete require.cache[defaultOutputJSON];
 
     assert.doesNotThrow(function () {
       report = require(defaultOutputJSON);
     }, 'coverage file not found or invalid');
 
     assert.ok(fs.existsSync(defaultOutputXML), 'cobertura file not found');
-    if (validator) validator(report);
+    if (validator) {
+      validator(report);
+    }
   };
 }
 
@@ -40,13 +46,13 @@ function createTestInstance(testFile, opts) {
     output: output,
     // output: debugOutput, // for debugging
     reporter: 'tap'
-  })
-  .plugin(istanbul, opts);
+  }).plugin(istanbul, opts);
 }
 
 function resetOutput() {
   out = '';
   output = through(function (chunk, enc, next) {
+    /*jslint unparam: true */
     out += chunk;
     next();
   });
@@ -68,7 +74,8 @@ describe('Basic', function () {
       var keys = Object.keys(report);
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
-      assert.equal(path.basename(keys[0]), 'pass-100.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-100.js',
+        'wrong file instrumented');
       done();
     }));
   });
@@ -81,11 +88,15 @@ describe('Basic', function () {
       var keys = Object.keys(report);
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
-      assert.equal(path.basename(keys[0]), 'pass-50.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-50.js',
+        'wrong file instrumented');
 
-      assert.deepEqual(report[keys[0]].s, expectedResult.s, 'statement reported count dont match');
-      assert.deepEqual(report[keys[0]].b, expectedResult.b, 'branch reported count dont match');
-      assert.deepEqual(report[keys[0]].f, expectedResult.f, 'function reported count dont match');
+      assert.deepEqual(report[keys[0]].s, expectedResult.s,
+        'statement reported count dont match');
+      assert.deepEqual(report[keys[0]].b, expectedResult.b,
+        'branch reported count dont match');
+      assert.deepEqual(report[keys[0]].f, expectedResult.f,
+        'function reported count dont match');
       done();
     }));
   });
@@ -97,7 +108,8 @@ describe('Basic', function () {
       var keys = Object.keys(report);
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
-      assert.equal(path.basename(keys[0]), 'fail-50.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[0]), 'fail-50.js',
+        'wrong file instrumented');
       done();
     }));
   });
@@ -108,8 +120,7 @@ describe('Basic', function () {
 
     createTestInstance(testFile, {
       report: ['json']
-    })
-    .bundle(function () {
+    }).bundle(function () {
       // save first output, reset the stream and compare
       firstOut = out;
       resetOutput();
@@ -132,7 +143,8 @@ describe('Basic', function () {
       var keys = Object.keys(report);
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
-      assert.equal(path.basename(keys[0]), 'pass-ignore-case.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-ignore-case.js',
+        'wrong file instrumented');
       done();
     }));
   });
@@ -145,7 +157,8 @@ describe('Basic', function () {
       var keys = Object.keys(report);
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
-      assert.equal(path.basename(keys[0]), 'pass-ignore-case.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-ignore-case.js',
+        'wrong file instrumented');
       done();
     }));
   });
