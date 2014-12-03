@@ -4,7 +4,9 @@
   "description": "Istanbul for mochify",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha ./test/*.js"
+    "test": "./node_modules/.bin/mocha ./test/*.js",
+    "dev": "./node_modules/.bin/mocha -w ./test/*.js",
+    "lint": "jslint --terse --color --edition latest *.js **/*.js"
   },
   "repository": {
     "type": "git",
@@ -23,12 +25,12 @@
   "homepage": "https://github.com/ferlores/mochify-istanbul",
   "dependencies": {
     "istanbul": "^0.3.2",
-    "lodash": "^2.4.1",
     "minimatch": "^1.0.0",
     "through2": "^0.6.3"
   },
   "devDependencies": {
     "assert": "^1.1.2",
+    "jslint": "^0.6",
     "mocha": "^2.0.1",
     "mochify": "^2.0.0",
     "phantomjs": "^1.9.12",
