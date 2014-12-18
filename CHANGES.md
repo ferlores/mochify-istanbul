@@ -1,3 +1,6 @@
+v2.1.1
+- Update README usage
+
 v2.1.0
 - Fix critical bug: coverage was reported without waiting for the test to finish
 - Now ```exclude``` parameter can be an array. In command line ```--exclude 'pattern1' --exclude 'pattern2'```
