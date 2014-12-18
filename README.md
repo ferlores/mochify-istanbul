@@ -17,13 +17,13 @@ var mochify = require('mochify');
 var istanbul = require('mochify-istanbul');
 
 va b = mochify('path/to/your/file', mochifyOpts)
-  .plugin(istanbul({
+  .plugin(istanbul, {
     // Intrumenter options
     exclude: ['**/test/**/*', '**/node_modules/**/*']
     // Reporter options
     report: ['text', 'cobertura', 'json'],
     dir: './coverage'
-  }))
+  })
   .bundle();
 ```
 
