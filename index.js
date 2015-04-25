@@ -38,10 +38,15 @@ function instrument(options) {
   return transform;
 }
 
+var report = [];
+
 function writeReports(options) {
   var collector = new Istanbul.Collector();
-  var report = options.report || [];
-  delete(options.report);
+
+  if (options.report) {
+    report = options.report;
+    delete(options.report);
+  }
 
   var data = '';
   return through(function(buf, enc, next) {
@@ -74,6 +79,11 @@ function writeReports(options) {
 module.exports = function (b, opts) {
   var reporterOptions = _.omit(opts, 'exclude');
 
+  function apply() {
+    b.pipeline.get('wrap').push(writeReports(reporterOptions));
+  }
+
   b.transform(instrument(opts));
-  b.pipeline.get('wrap').push(writeReports(reporterOptions));
+  apply();
+  b.on('reset', apply);
 };
