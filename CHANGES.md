@@ -1,3 +1,6 @@
+v2.1.2
+- Fix for watchify option
+
 v2.1.1
 - Update README usage
 
