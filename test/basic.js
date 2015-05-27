@@ -1,3 +1,4 @@
+'use strict';
 
 var fs = require('fs');
 var path = require('path');
@@ -69,6 +70,21 @@ describe('Basic', function () {
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
       assert.equal(path.basename(keys[0]), 'pass-100.js', 'wrong file instrumented');
+      done();
+    }));
+  });
+
+  it('should instrument multiple files and only expose coverage once', function (done) {
+    createTestInstance('./test/fixtures/pass-50.js ./test/fixtures/pass-100.js', {
+      report: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 2, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-50.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[1]), 'pass-100.js', 'wrong file instrumented');
+      assert.equal(JSON.stringify(report[keys[0]].s), '{"1":1,"2":1,"3":1,"4":0}', 'not 50% coverage');
+      assert.equal(JSON.stringify(report[keys[1]].s), '{"1":1,"2":1,"3":1}', 'not 100% coverage');
       done();
     }));
   });

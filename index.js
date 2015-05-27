@@ -1,3 +1,5 @@
+'use strict';
+
 var Istanbul = require('istanbul');
 var through = require('through2');
 var minimatch = require("minimatch");
@@ -6,6 +8,7 @@ var _ = require('lodash');
 function instrument(options) {
   var excludePattern = options.exclude ? [].concat(options.exclude) : [''];
   var instrumenter = new Istanbul.Instrumenter();
+  var captured = false;
 
   function transform(file) {
     // If if doesnt match the pattern dont instrument it
@@ -23,13 +26,18 @@ function instrument(options) {
     }, function(next) {
       var self = this;
       instrumenter.instrument(data, file, function(err, code) {
-        if (!err) {
-          // Inject __converage__ var
-          self.push(code);
-          self.push('after(function(){console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");});');
-        } else {
+        if (err) {
           self.emit('error', err);
+          return next();
         }
+
+        // Inject __converage__ var
+        self.push(code);
+        if (!captured) {
+          captured = true;
+          self.push('after(function(){console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");});');
+        }
+
         next();
       });
     });
@@ -84,6 +92,6 @@ module.exports = function (b, opts) {
   }
 
   b.transform(instrument(opts));
-  apply();
   b.on('reset', apply);
+  apply();
 };
