@@ -9,8 +9,8 @@ var rimraf = require('rimraf');
 var istanbul = require('../');
 
 var phantomjsPath = path.resolve('node_modules/.bin/phantomjs');
-var defaultOutputJSON = path.resolve('./coverage-final.json');
-var defaultOutputXML = path.resolve('./cobertura-coverage.xml');
+var defaultOutputJSON = path.resolve('./coverage/coverage-final.json');
+var defaultOutputXML = path.resolve('./coverage/cobertura-coverage.xml');
 
 var out;
 var output;
@@ -174,5 +174,19 @@ describe('Basic', function () {
       assert.deepEqual(report, {}, 'some files were instrumented');
       done();
     }));
+  });
+
+  it('should support other instrumenters that support ES6', function () {
+    createTestInstance('./test/fixtures/es6.js', {
+      instrumenter: 'babel-istanbul',
+      report: ['json', 'cobertura']
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'es6.js', 'wrong file instrumented');
+      assert.equal(keys.length, 1);
+      done();
+    }))
   });
 });

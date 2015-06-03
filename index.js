@@ -89,7 +89,6 @@ function writeReports(options) {
 module.exports = function (b, opts) {
   opts = _.extend({
     instrumenter: 'istanbul',
-    exclude: ['**/node_modules/**', '**/test/**', '**/tests/**'],
     dir: './coverage',
   }, opts);
   var reporterOptions = _.omit(opts, 'exclude');

@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "assert": "^1.1.2",
+    "babel-istanbul": "^0.2.0",
     "mocha": "^2.0.1",
     "mochify": "^2.0.0",
     "phantomjs": "^1.9.12",
