@@ -1,13 +1,14 @@
 'use strict';
 
-var Istanbul = require('istanbul');
+var resolve = require('resolve');
 var through = require('through2');
 var minimatch = require("minimatch");
 var _ = require('lodash');
 
 function instrument(options) {
+  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: process.cwd()}));
   var excludePattern = options.exclude ? [].concat(options.exclude) : [''];
-  var instrumenter = new Istanbul.Instrumenter();
+  var instrumenter = new Instrumenter.Instrumenter();
   var captured = false;
 
   function transform(file) {
@@ -49,7 +50,8 @@ function instrument(options) {
 var report = [];
 
 function writeReports(options) {
-  var collector = new Istanbul.Collector();
+  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: process.cwd()}));
+  var collector = new Instrumenter.Collector();
 
   if (options.report) {
     report = options.report;
@@ -75,7 +77,7 @@ function writeReports(options) {
 
     // Add report
     [].concat(report).forEach(function (reportType) {
-      Istanbul.Report
+      Instrumenter.Report
         .create(reportType, _.clone(options))
         .writeReport(collector, true);
     });
@@ -85,6 +87,10 @@ function writeReports(options) {
 }
 
 module.exports = function (b, opts) {
+  opts = _.extend({
+    instrumenter: 'istanbul',
+    dir: './coverage',
+  }, opts);
   var reporterOptions = _.omit(opts, 'exclude');
 
   function apply() {
