@@ -1,6 +1,6 @@
 {
   "name": "mochify-istanbul",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Istanbul for mochify",
   "main": "index.js",
   "scripts": {
