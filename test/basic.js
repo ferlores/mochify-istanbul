@@ -9,8 +9,8 @@ var rimraf = require('rimraf');
 var istanbul = require('../');
 
 var phantomjsPath = path.resolve('node_modules/.bin/phantomjs');
-var defaultOutputJSON = path.resolve('./coverage/coverage-final.json');
-var defaultOutputXML = path.resolve('./coverage/cobertura-coverage.xml');
+var defaultOutputJSON = path.resolve('./coverage-final.json');
+var defaultOutputXML = path.resolve('./cobertura-coverage.xml');
 
 var out;
 var output;
