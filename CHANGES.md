@@ -1,3 +1,9 @@
+v2.2.1
+- Fix default istanbul module not found #15
+
+v2.2.0
+- Add support for babel instrumenter #14
+
 v2.1.2
 - Fix for watchify option
 
