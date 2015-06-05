@@ -6,7 +6,7 @@ var minimatch = require("minimatch");
 var _ = require('lodash');
 
 function instrument(options) {
-  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: process.cwd()}));
+  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: __dirname}));
   var excludePattern = options.exclude ? [].concat(options.exclude) : [''];
   var instrumenter = new Instrumenter.Instrumenter();
   var captured = false;
@@ -50,7 +50,7 @@ function instrument(options) {
 var report = [];
 
 function writeReports(options) {
-  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: process.cwd()}));
+  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: __dirname}));
   var collector = new Instrumenter.Collector();
 
   if (options.report) {
