@@ -64,16 +64,16 @@ function writeReports(options) {
     next();
   }, function(next) {
     var re = /__coverage__='([^;]*)';\n/gi,
-        match = re.exec(data),
-        coverage;
+        match;
+
+    // capture all the matches, there might be multiple
+    while (match = re.exec(data)) {
+      // match[1] contains JSON.stringify(__coverage__)
+      collector.add(JSON.parse(match[1]));
+    }
 
     // Clean up the stream
     this.push(data.replace(re,''));
-
-    // match[1] contains JSON.stringify(__coverage__)
-    coverage = match ? JSON.parse(match[1]) || {} : {};
-
-    collector.add(coverage);
 
     // Add report
     [].concat(report).forEach(function (reportType) {

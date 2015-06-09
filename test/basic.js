@@ -33,16 +33,32 @@ function validateOutput(validator) {
   };
 }
 
+function duplicate(b) {
+  var data = '';
+  b.pipeline.get('wrap').push(through(function (buf, enc, next) {
+    data += buf;
+    next();
+  }, function (next) {
+    this.push(data);
+    this.push(data);
+    data = '';
+    next();
+  }));
+}
+
 function createTestInstance(testFile, opts) {
   // For debugging
   // var debugOutput = require('fs').createWriteStream('./tmp.txt');
 
-  return mochify(testFile, {
+  var m = mochify(testFile, {
     output: output,
     // output: debugOutput, // for debugging
     reporter: 'tap'
-  })
-  .plugin(istanbul, opts);
+  });
+  if (opts.duplicate) {
+    m = m.plugin(duplicate);
+  }
+  return m.plugin(istanbul, opts);
 }
 
 function resetOutput() {
@@ -85,6 +101,22 @@ describe('Basic', function () {
       assert.equal(path.basename(keys[1]), 'pass-100.js', 'wrong file instrumented');
       assert.equal(JSON.stringify(report[keys[0]].s), '{"1":1,"2":1,"3":1,"4":0}', 'not 50% coverage');
       assert.equal(JSON.stringify(report[keys[1]].s), '{"1":1,"2":1,"3":1}', 'not 100% coverage');
+      done();
+    }));
+  });
+
+  it('should collect multiple coverage statistics', function (done) {
+    createTestInstance('./test/fixtures/pass-50.js ./test/fixtures/pass-100.js', {
+      report: ['json', 'cobertura'],
+      duplicate: true
+    }).bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 2, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'pass-50.js', 'wrong file instrumented');
+      assert.equal(path.basename(keys[1]), 'pass-100.js', 'wrong file instrumented');
+      assert.equal(JSON.stringify(report[keys[0]].s), '{"1":2,"2":2,"3":2,"4":0}', 'not 50% coverage');
+      assert.equal(JSON.stringify(report[keys[1]].s), '{"1":2,"2":2,"3":2}', 'not 100% coverage');
       done();
     }));
   });
