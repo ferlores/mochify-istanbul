@@ -1,3 +1,9 @@
+v2.3.0
+- Support for running in multiple browsers (now the result is the aggregated coverage of all the runs)
+
+v2.2.2
+- Revert defaults for output directory
+
 v2.2.1
 - Fix default istanbul module not found #15
 
