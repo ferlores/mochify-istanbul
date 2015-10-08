@@ -63,7 +63,7 @@ function writeReports(options) {
     data += buf;
     next();
   }, function(next) {
-    var re = /__coverage__='([^;]*)';\n/gi,
+    var re = /__coverage__='([^;]*)';(\r\n?|\n)/gi,
         match;
 
     // capture all the matches, there might be multiple
