@@ -208,7 +208,7 @@ describe('Basic', function () {
     }));
   });
 
-  it('should support other instrumenters that support ES6', function () {
+  it.skip('should support other instrumenters that support ES6', function (done) {
     createTestInstance('./test/fixtures/es6.js', {
       instrumenter: 'babel-istanbul',
       report: ['json', 'cobertura']
@@ -217,8 +217,36 @@ describe('Basic', function () {
 
       assert.equal(keys.length, 1, 'more than one file instrumented');
       assert.equal(path.basename(keys[0]), 'es6.js', 'wrong file instrumented');
-      assert.equal(keys.length, 1);
       done();
     }))
   });
+
+  it('should work with babelify', function (done) {
+    this.timeout(10000); // prevent timeout on travis
+    var m = createTestInstance('./test/fixtures/es6.js', {
+      report: ['json', 'cobertura']
+    });
+    m.transform('babelify', { presets: ["es2015"] });
+    m.bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'es6.js', 'wrong file instrumented');
+      done();
+    }))
+  });
+
+  it('should allow to include files in node_modules folders', function (done) {
+    var m = createTestInstance('./test/fixtures/node_modules/dep.js', {
+      report: ['json', 'cobertura']
+    });
+    m.bundle(validateOutput(function (report) {
+      var keys = Object.keys(report);
+
+      assert.equal(keys.length, 1, 'more than one file instrumented');
+      assert.equal(path.basename(keys[0]), 'dep.js', 'wrong file instrumented');
+      done();
+    }))
+  });
+
 });
