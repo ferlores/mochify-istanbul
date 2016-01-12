@@ -5,46 +5,48 @@ var through = require('through2');
 var minimatch = require("minimatch");
 var _ = require('lodash');
 
-function instrument(options) {
-  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: __dirname}));
+function filterFiles(options, files) {
   var excludePattern = options.exclude ? [].concat(options.exclude) : [''];
-  var instrumenter = new Instrumenter.Instrumenter();
-  var captured = false;
-
-  function transform(file) {
+  return function (file) {
     // If if doesnt match the pattern dont instrument it
     var matchResult = _.compact(_.map(excludePattern, function (pattern) {
       return minimatch(file, pattern);
     }));
+    if (!matchResult.length) {
+      files[file] = true;
+    }
+    return through();
+  };
+}
 
-    if (matchResult.length)
-      return through();
+function instrument(options, files) {
+  var Instrumenter = require(resolve.sync(options.instrumenter, {basedir: __dirname}));
+  var instrumenter = new Instrumenter.Instrumenter();
+  var captured = false;
 
-    var data = '';
-    return through(function(buf, enc, next) {
-      data += buf;
+  return through.obj(function(row, enc, next) {
+    if (!files[row.file]) {
+      this.push(row);
       next();
-    }, function(next) {
-      var self = this;
-      instrumenter.instrument(data, file, function(err, code) {
-        if (err) {
-          self.emit('error', err);
-          return next();
-        }
-
-        // Inject __converage__ var
-        self.push(code);
-        if (!captured) {
-          captured = true;
-          self.push('after(function(){console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");});');
-        }
-
+      return;
+    }
+    var self = this;
+    instrumenter.instrument(row.source, row.file, function(err, code) {
+      if (err) {
+        self.emit('error', err);
         next();
-      });
+        return;
+      }
+      row.source = code;
+      // Inject __converage__ var
+      if (!captured) {
+        captured = true;
+        row.source += 'after(function(){console.log("__coverage__=\'" + JSON.stringify(__coverage__) + "\';");});';
+      }
+      self.push(row);
+      next();
     });
-  }
-
-  return transform;
+  });
 }
 
 var report = [];
@@ -55,7 +57,7 @@ function writeReports(options) {
 
   if (options.report) {
     report = options.report;
-    delete(options.report);
+    delete options.report;
   }
 
   var data = '';
@@ -91,12 +93,14 @@ module.exports = function (b, opts) {
     instrumenter: 'istanbul',
   }, opts);
   var reporterOptions = _.omit(opts, 'exclude');
+  var files = {};
 
   function apply() {
+    b.pipeline.get('pack').unshift(instrument(opts, files));
     b.pipeline.get('wrap').push(writeReports(reporterOptions));
   }
 
-  b.transform(instrument(opts));
+  b.transform(filterFiles(opts, files));
   b.on('reset', apply);
   apply();
 };
