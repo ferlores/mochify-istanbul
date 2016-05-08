@@ -19,8 +19,8 @@ var istanbul = require('mochify-istanbul');
 va b = mochify('path/to/your/file', mochifyOpts)
   .plugin(istanbul, {
     // Plugin options
-    intrumenter: 'babel-istanbul',
-    // Intrumenter options
+    instrumenter: 'babel-istanbul',
+    // Instrumenter options
     exclude: ['**/test/**/*', '**/node_modules/**/*'],
     // Reporter options
     report: ['text', 'cobertura', 'json'],
