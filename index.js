@@ -1,6 +1,5 @@
 'use strict';
 
-var os = require('os');
 var resolve = require('resolve');
 var through = require('through2');
 var minimatch = require('minimatch');
