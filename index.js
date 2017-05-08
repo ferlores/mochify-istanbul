@@ -4,8 +4,8 @@ var os = require('os');
 var resolve = require('resolve');
 var through = require('through2');
 var minimatch = require('minimatch');
-var combine = require('stream-combiner');
-var split = require('split');
+var combine = require('stream-combiner2');
+var split = require('split2');
 var _ = require('lodash');
 
 function filterFiles(options, files) {
