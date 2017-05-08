@@ -1,5 +1,9 @@
 # Changes
 
+## 2.4.2
+
+- Fix exit without any report when tests fail (Frederik Ring)
+
 ## 2.4.1
 
 - Upgrade `istanbul`, `minimatch` and `through2`
