@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var exec = require('child_process').exec;
 var mochify = require('mochify');
 var assert = require('assert');
 var through = require('through2');
@@ -249,4 +250,23 @@ describe('Basic', function () {
     }))
   });
 
+  it('should print full test reports when run from the command line', function (done) {
+    var testFile = './test/fixtures/fail-50.js';
+    var reporter = 'tap'
+    var firstOut;
+
+    createTestInstance(testFile, {
+      report: ['json']
+    })
+    .bundle(function () {
+      // save first output, reset the stream and compare
+      firstOut = out;
+      resetOutput();
+
+      exec('./node_modules/.bin/mochify --reporter=tap --plugin [ . ] ' + testFile, function(err, result) {
+        assert.deepEqual(firstOut, result, 'cli did not print full test report');
+        done();
+      });
+    });
+  });
 });
