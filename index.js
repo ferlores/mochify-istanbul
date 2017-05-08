@@ -2,7 +2,9 @@
 
 var resolve = require('resolve');
 var through = require('through2');
-var minimatch = require("minimatch");
+var minimatch = require('minimatch');
+var combine = require('stream-combiner2');
+var split = require('split2');
 var _ = require('lodash');
 
 function filterFiles(options, files) {
@@ -61,21 +63,25 @@ function writeReports(options) {
   }
 
   var data = '';
-  return through(function(buf, enc, next) {
+  var coverageRe = /__coverage__='([^;]*)';/gi;
+  var skippedPreviousLine = false;
+  var extractCoverage = through(function(buf, enc, next) {
     data += buf;
+    if (!coverageRe.test(buf.toString())) {
+      if (!skippedPreviousLine) this.push(buf);
+      skippedPreviousLine = false;
+    } else {
+      skippedPreviousLine = true;
+    }
     next();
   }, function(next) {
-    var re = /__coverage__='([^;]*)';(\r\n?|\n)/gi,
-        match;
-
+    var re = /__coverage__='([^;]*)';(\r\n?|\n)/gi;
+    var match;
     // capture all the matches, there might be multiple
     while (match = re.exec(data)) {
       // match[1] contains JSON.stringify(__coverage__)
       collector.add(JSON.parse(match[1]));
     }
-
-    // Clean up the stream
-    this.push(data.replace(re,''));
 
     // Add report
     [].concat(report).forEach(function (reportType) {
@@ -83,9 +89,9 @@ function writeReports(options) {
         .create(reportType, _.clone(options))
         .writeReport(collector, true);
     });
-
     next();
   });
+  return combine(split(/(\r?\n)/), extractCoverage);
 }
 
 module.exports = function (b, opts) {
