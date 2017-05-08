@@ -64,18 +64,16 @@ function writeReports(options) {
   }
 
   var data = '';
-  var coverageRe = /__coverage__='([^;]*)'/gi;
+  var coverageRe = /__coverage__='([^;]*)';(\r\n?|\n)/gi;
   var extractCoverage = through(function(buf, enc, next) {
     data += buf;
     if (!coverageRe.test(buf.toString())) {
       this.push(buf);
-      this.push(os.EOL);
     }
     next();
   }, function(next) {
     var re = /__coverage__='([^;]*)';(\r\n?|\n)/gi;
     var match;
-
     // capture all the matches, there might be multiple
     while (match = re.exec(data)) {
       // match[1] contains JSON.stringify(__coverage__)
@@ -88,10 +86,9 @@ function writeReports(options) {
         .create(reportType, _.clone(options))
         .writeReport(collector, true);
     });
-
     next();
   });
-  return combine(split(), extractCoverage);
+  return combine(split(/(\r?\n)/), extractCoverage);
 }
 
 module.exports = function (b, opts) {
