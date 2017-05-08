@@ -64,11 +64,15 @@ function writeReports(options) {
   }
 
   var data = '';
-  var coverageRe = /__coverage__='([^;]*)';(\r\n?|\n)/gi;
+  var coverageRe = /__coverage__='([^;]*)';/gi;
+  var skippedPreviousLine = false;
   var extractCoverage = through(function(buf, enc, next) {
     data += buf;
     if (!coverageRe.test(buf.toString())) {
-      this.push(buf);
+      if (!skippedPreviousLine) this.push(buf);
+      skippedPreviousLine = false;
+    } else {
+      skippedPreviousLine = true;
     }
     next();
   }, function(next) {
