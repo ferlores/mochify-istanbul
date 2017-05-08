@@ -1,24 +1,45 @@
-v2.3.0
+# Changes
+
+## 2.4.1
+
+- Upgrade `istanbul`, `minimatch` and `through2`
+
+## 2.4.0
+
+- Apply instrumentation in the Browserify pipeline instead of a transform
+
+  This refactoring allow other transforms to modify the source code before instrumentation happens, e.g. the babelify transform.
+  Fixes https://github.com/mantoni/mochify.js/issues/116
+
+## 2.3.0
+
 - Support for running in multiple browsers (now the result is the aggregated coverage of all the runs)
 
-v2.2.2
+## 2.2.2
+
 - Revert defaults for output directory
 
-v2.2.1
+## 2.2.1
+
 - Fix default istanbul module not found #15
 
-v2.2.0
+## 2.2.0
+
 - Add support for babel instrumenter #14
 
-v2.1.2
+## 2.1.2
+
 - Fix for watchify option
 
-v2.1.1
+## 2.1.1
+
 - Update README usage
 
-v2.1.0
+## 2.1.0
+
 - Fix critical bug: coverage was reported without waiting for the test to finish
 - Now ```exclude``` parameter can be an array. In command line ```--exclude 'pattern1' --exclude 'pattern2'```
 
-v2.0.0
+## 2.0.0
+
 - First real usable version published in NPM
