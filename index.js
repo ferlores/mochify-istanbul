@@ -6,17 +6,91 @@ var minimatch = require('minimatch');
 var combine = require('stream-combiner2');
 var split = require('split2');
 var _ = require('lodash');
+var fspath = require('path');
+var fs = require('fs');
+
+function matchesPatterns(patterns, input) {
+  var matchResult = _.compact(_.map(patterns, function (pattern) {
+    return minimatch(input, pattern);
+  }));
+  return matchResult.length > 0;
+}
+
+function walkDirSync(rootDir, options) {
+  var processed = new Set();
+  var dirs = [rootDir];
+  var result = [];
+  options = options || {};
+
+  for (var i = 0; i < dirs.length; ++i) {
+    var parentPath = dirs[i];
+    fs.readdirSync(parentPath).map(function(subPath) {
+      return fspath.join(parentPath, subPath);
+    }).forEach(function (fullPath) {
+      var realFullPath = fs.realpathSync(fullPath);
+      if (processed.has(realFullPath)) {
+        return;
+      }
+
+      processed.add(realFullPath);
+
+      if (fs.statSync(fullPath).isDirectory()) {
+        dirs.push(fullPath);
+        return;
+      }
+
+      // Include file by default
+      var includeInResult = true;
+
+      if (options.include) {
+        // Exclude non-matched file that should be included
+        if (!matchesPatterns(options.include, fullPath)) {
+          includeInResult = false;
+        }
+      }
+
+      if (options.exclude) {
+        // Exclude matched file that should be excluded
+        if (matchesPatterns(options.exclude, fullPath)) {
+          includeInResult = false;
+        }
+      }
+
+      if (includeInResult) {
+        result.push(fullPath);
+      }
+    });
+  }
+
+  return result;
+}
+
+function getAllSources(options) {
+  if (!options.all) {
+    return [];
+  }
+  return walkDirSync(options.root, {include: options.include, exclude: options.exclude});
+}
 
 function filterFiles(options, files) {
-  var excludePattern = options.exclude ? [].concat(options.exclude) : [''];
   return function (file) {
-    // If if doesnt match the pattern dont instrument it
-    var matchResult = _.compact(_.map(excludePattern, function (pattern) {
-      return minimatch(file, pattern);
-    }));
-    if (!matchResult.length) {
-      files[file] = true;
+    // Instrument file by default
+    files[file] = true;
+
+    if (options.include) {
+      // Do not instrument non-matched file that should be included
+      if (!matchesPatterns(options.include, file)) {
+        files[file] = false;
+      }
     }
+
+    if (options.exclude) {
+      // Do not instrument matched file that should be excluded
+      if (matchesPatterns(options.exclude, file)) {
+        files[file] = false;
+      }
+    }
+
     return through();
   };
 }
@@ -98,10 +172,16 @@ module.exports = function (b, opts) {
   opts = _.extend({
     instrumenter: 'istanbul',
   }, opts);
-  var reporterOptions = _.omit(opts, 'exclude');
-  var files = {};
 
+  opts.include = opts.include ? [].concat(opts.include) : null,
+  opts.exclude = opts.exclude ? [].concat(opts.exclude) : null,
+  opts.all = !!opts.all;
+  opts.root = opts.root ? fspath.resolve(opts.root) : process.cwd();
+
+  var reporterOptions = _.omit(opts, 'include', 'exclude', 'all', 'root');
+  var files = {};
   function apply() {
+    b.add(getAllSources(opts));
     b.pipeline.get('pack').unshift(instrument(opts, files));
     b.pipeline.get('wrap').push(writeReports(reporterOptions));
   }
